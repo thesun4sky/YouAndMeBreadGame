@@ -45,8 +45,12 @@ angular.module('starter', [
     url: '/mode',
     templateUrl: 'templates/Select_mode.html',
     controller: 'ModeCtrl'
-  })
-
+    })
+    .state('play', {
+      url: '/play',
+      templateUrl: 'templates/gamePlay.html'
+      // controller: 'gameCtrl'
+    });
 
 
   // if none of the above states are matched, use this as the fallback
