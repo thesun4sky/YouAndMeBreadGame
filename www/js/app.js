@@ -48,8 +48,8 @@ angular.module('starter', [
     })
     .state('play', {
       url: '/play',
-      templateUrl: 'templates/gamePlay.html'
-      // controller: 'gameCtrl'
+      templateUrl: 'templates/Play.html',
+      controller: 'PlayCtrl'
     });
 
 
