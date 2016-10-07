@@ -2,7 +2,79 @@ angular.module('starter.controllers', [])
 
 
 
-.controller('ModeCtrl', function($scope) {})
+.controller('ModeCtrl', function($scope,$state) {
+
+  level_value=Math.PI /180  * 12 * 11;
+  exp_value = Math.PI / 180 * 3.6 * 70;
+
+  stage = new createjs.Stage("modeCanvas");
+
+  rect = new createjs.Shape();
+  rect.graphics.beginFill("#ff9600").drawRoundRect(260,270,200,150,30,30,30,30);
+  rect.shadow = new createjs.Shadow('#000', 4, 4, 5);
+  stage.addChild(rect);
+
+  rect.addEventListener("click", function(event) {
+      $state.go("play");
+     })
+
+  rect2 = new createjs.Shape();
+  rect2.graphics.beginFill("#ff9600").drawRoundRect(500,270,200,150,30,30,30,30);
+  rect2.shadow = new createjs.Shadow('#000', 4, 4, 5);
+  stage.addChild(rect2);
+
+  pie1 = new createjs.Shape().set({x:280, y:150});
+  pie1.rotation = -90;
+  pie1.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-level_value ,true);
+  stage.addChild(pie1);
+
+  pie2 = new createjs.Shape().set({x:680, y:150});
+  pie2.rotation = -90;
+  pie2.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-exp_value ,true);
+
+  stage.addChild(pie2);
+
+  //레벨
+  text1 = new createjs.Text("Level. 11", "20px Arial", "#ff0000");
+  text1.x = 240;
+  text1.y = 140;
+  stage.addChild(text1);
+
+  //경험치
+  text2 = new createjs.Text("Exp. 70%", "20px Arial", "#ff0000");
+  text2.x = 640;
+  text2.y = 140;
+  stage.addChild(text2);
+
+
+  //싱글
+  single = new createjs.Text("싱글 플레이", "25px Arial", "#ff0000");
+  single.x = 295;
+  single.y = 320;
+  stage.addChild(single);
+
+  single2 = new createjs.Text("Single Play", "15px Arial", "#ff0000");
+  single2.x = 325;
+  single2.y = 350;
+  stage.addChild(single2);
+
+
+
+  //멀티
+  single = new createjs.Text("멀티 플레이", "25px Arial", "#ff0000");
+  single.x = 535;
+  single.y = 320;
+  stage.addChild(single);
+
+  single2 = new createjs.Text("Multi Play", "15px Arial", "#ff0000");
+  single2.x = 565;
+  single2.y = 350;
+  stage.addChild(single2);
+
+
+  stage.update();
+})
+
 .controller('PlayCtrl', function($scope) {
 
 
