@@ -130,8 +130,6 @@ angular.module('starter.controllers', [])
   single2.y = 350;
   stage.addChild(single2);
 
-
-
   //멀티
   single = new createjs.Text("멀티 플레이", "25px Arial", "#ff0000");
   single.x = 535;
@@ -213,29 +211,43 @@ angular.module('starter.controllers', [])
 
 .controller('PlayCtrl', function($scope) {
 
-
-  var workAnt, fireAnt; //개미 추가
-
-  var enemy;
-  var ant;
-
-  var winWidth = window.innerWidth;
-  var winHeight = window.innerHeight;
-  console.log(winWidth + "" + winHeight);
-
-  $scope.myAntList = [];
-  $scope.enemyAntList = [];
-
+  // 빵의 기본 좌표 설정
+  var startPositionX = 140;
+  var startPositionY = 230;
 
   var stage;
+  var myAntList = [];
+  var enemyAntList = [];
+
+
+  var workAnt, fireAnt; //개미 추가
+  var attack = function (ant) {
+    enemyAntList[ant.enemy].hp -= ant.damage;
+  };
+
+  var move = function (unit, direction) {
+    if (unit.x < 800) {
+      // console.log("move function is called" + unit.x + ", " + unit.y);
+      if (direction == "down") {
+        unit.x = unit.x + 2;
+        unit.y = (Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
+      } else if (direction == "up") {
+        unit.x = unit.x + 1;
+        unit.y = (-Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
+      } else if (direction == "straight") {
+        unit.x = unit.x + 2;
+        unit.y = startPositionY;
+      }
+    }
+    else {
+      unit.x = startPositionX;
+      unit.y = startPositionY;
+    }
+  };
 
   function init() {
 
-    var id;
-
     var ant = function (team, type) {
-      id++;
-      var antId = id;
       var type = type;
       var team = team;
       var state;
@@ -244,21 +256,17 @@ angular.module('starter.controllers', [])
       var atkSpeed;
       var damage;
       var skill;
-      var x;
-      var y;
       var enemy = null;
-      return this
     };
 
-    // 빵의 기본 좌표 설정
-    var startPositionX = 140;
-    var startPositionY = 230;
+    ///////////////////기본 설정////////////////
+
 
     //canvas와 js 연동
     stage = new createjs.Stage("demoCanvas");
     var image = new createjs.Bitmap("img/YMBplay.png");
     stage.addChild(image);
-
+    createjs.Touch.enable(stage);
     // 빵의 생산량
     var text = new createjs.Text("2000", "60px Arial", "#ffffff");
     text.x = 380; text.y = 10;
@@ -271,96 +279,110 @@ angular.module('starter.controllers', [])
     bread.y = 285;
     stage.addChild(bread);
 
-    //빵 모양 및 위치 초기화
-    var enemy = new createjs.Shape();
-    enemy.graphics.beginFill("blue").drawCircle(0, 0, 30);
-    enemy.x = 450;
-    enemy.y = 420;
-    stage.addChild(enemy);
+
+    //TODO 선택된 개미 추가 등등..
+
+    //////////////////////////기본 설정 끝
+
+    //적 생성
+    enemyId = 0;
+
+    enemyId++;
+    enemy0 = new createjs.Shape();
+    enemy0.graphics.beginFill("blue").drawCircle(0, 0, 30);
+    enemy0.x = 450;
+    enemy0.y = 420;
+    enemy0.hp = 1000;
+    stage.addChild(enemy0);
+    enemyAntList.push(enemy0);
+
+    enemy1 = new createjs.Shape();
+    enemy1.graphics.beginFill("blue").drawCircle(0, 0, 30);
+    enemy1.x = 350;
+    enemy1.y = 400;
+    enemy1.hp = 1000;
+    stage.addChild(enemy1);
+    enemyAntList.push(enemy1);
+
+
 
 
     //빵 클릭시 이벤트
     bread.addEventListener("click", function(event) {
-      makeAnt('down', 800);});
+      makeUnit('workAnt');
+    });
 
+    makeUnit('workAnt');
 
     //유닛 생성
     //방향 및 속성값을 받아 유닛 생성
     function makeUnit(type) {
       var image = new createjs.Bitmap("img/workant.png");
-      stage.addChild(image);
+      // image.prototype = new ant(1,type);
       image.x = startPositionX;
       image.y = startPositionY;
-      new ant(1, type);
-
-      return image;
+      image.hp = 100;
+      image.damage = 10;
+      stage.addChild(image);
+      myAntList.push(image);
     }
 
-
-    var makeAnt = function (direction, type) {
-      var ant = makeUnit(type);
-      setInterval(function () {
-//                    checkState(ant);
-//                    if (ant.state == "attack") {
-//                        attack(ant);
-//                    } else if (ant.state == "move") {
-        move(ant, direction)
-//                    }
-//
-      }, (100))
-    };
-
-    var checkState = function checkState(ant) {
-//                if ((ant.x - enemy.x) <= 50 && (ant.y - enemy.y) <= 50) {
-//                    ant.enemy = enemy;
-//                    ant.state = 'attack';
-//                } else {
-      ant.state = 'move';
-//                }
-    };
-
-
-    var attack = function (ant) {
-      ant.enemy.health -= ant.damage;
-    };
-
-    var move = function move(unit, direction) {
-
-      //////////////////////////이동
-      if (unit.x < 800) {
-        console.log("move function is called" + unit.x + ", " + unit.y);
-        if (direction == "down") {
-          unit.x = unit.x + 2;
-          unit.y = (Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
-        } else if (direction == "up") {
-          unit.x = unit.x + 1;
-          unit.y = (-Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
-        } else if (direction == "straight") {
-          unit.x = unit.x + 2;
-          unit.y = startPositionY;
-        }
-      }
-      else {
-        unit.x = startPositionX;
-        unit.y = startPositionY;
-      }
-      /////////////////////////이동 끝
-    };
-
-
-
-
-    createjs.Ticker.addEventListener("tick", stage);
-
-    makeAnt("up", 'workAnt');
-    makeAnt("straight", 'workAnt');
+    stage.update(event);
+    createjs.Ticker.addEventListener("tick", stateCheck);
+    createjs.Ticker.addEventListener("tick", doBehavior);
   }
 
-  function tick(event) {
+  function stateCheck(event) {
 
-//            var pt = enemy.localToLocal(100,0,target);
-//            if (ant.hitTest(pt.x, pt.y)) { ant.state = "attack"; }
-//            else {ant.stage = 'move'}
+    for (var i=0; i<myAntList.length; i++) {
+      myAntList.forEach(function (ant) {
+        //체력이 0일 경우
+        if (ant.hp <= 0) {
+          myAntList.splice(i,1);
+        }
+        ant.state = "move";
+
+
+        for (var j = 0; j < enemyAntList.length; j++) {
+          if (enemyAntList[j].hp <= 0) {
+            enemyAntList.splice(j,1);
+            stage.removeChild(enemy1);
+            alert("적 체력 0");
+          }
+          var pt = enemyAntList[j].localToLocal(-50, 0, ant);
+          if (ant.hitTest(pt.x, pt.y)) {
+            ant.state = "attack";
+            ant.enemy = j;
+          } else {
+            ant.state = "move";
+            ant.enemy = null;
+          }
+        }
+        // stage.update(event);
+      })
+    }
+
+      /*enemyAntList.forEach(function (enemy) {
+        var pt = enemy.localToLocal(-50, 0, ant);
+        if (ant.hitTest(pt.x, pt.y)) {
+          ant.state = "attack";
+          ant.enemy = this;
+        } else {
+          ant.state = "move";
+        }
+      });*/
+    // stage.update(event);
+  }
+
+
+  function doBehavior(event) {
+    myAntList.forEach(function(ant) {
+      if (ant.state =="attack") {
+        attack(ant);
+      } else if (ant.state == "move") {
+        move(ant,"down");
+      }
+    });
     stage.update(event);
   }
 
