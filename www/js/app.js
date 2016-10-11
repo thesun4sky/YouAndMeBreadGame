@@ -8,8 +8,8 @@
 angular.module('starter', [
           'ionic',
           'starter.controllers',
-          'starter.services',])
-
+          'starter.services'
+  ])
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -45,6 +45,11 @@ angular.module('starter', [
     url: '/mode',
     templateUrl: 'templates/Select_mode.html',
     controller: 'ModeCtrl'
+    })
+    .state('single',{
+      url: '/single',
+      templateUrl: 'templates/Single_play.html',
+      controller: 'SingleCtrl'
     })
     .state('play', {
       url: '/play',

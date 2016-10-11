@@ -9874,3 +9874,6 @@ a.button {
   width: 20%;
   margin:0 auto;
 }
+.canvas_color {
+  background: linear-gradient(to bottom, #210f00 0%, #210f00 50%, #6F2500 50%, #6F2500 100%);
+}

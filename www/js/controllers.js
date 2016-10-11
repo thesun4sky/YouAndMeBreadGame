@@ -4,35 +4,107 @@ angular.module('starter.controllers', [])
 
 .controller('ModeCtrl', function($scope,$state) {
 
-  level_value=Math.PI /180  * 12 * 11;
-  exp_value = Math.PI / 180 * 3.6 * 70;
 
   stage = new createjs.Stage("modeCanvas");
+  createjs.Touch.enable(stage);
 
+  var image = new createjs.Bitmap("img/bread.png");
+  stage.addChild(image);
+
+  image.x=830;
+  image.y=0;
+  image.scaleX =0.2;
+  image.scaleY = 0.2;
+
+
+  var image1 = new createjs.Bitmap("img/ant.png");
+  stage.addChild(image1);
+
+
+  //유저 프로필 로드
+  image1.x=20;
+  image1.y=420;
+  image1.scaleX =0.3;
+  image1.scaleY = 0.3;
+
+  var image2 = new createjs.Bitmap("img/user.png");
+  stage.addChild(image2);
+
+  image2.x=420;
+  image2.y=100;
+  image2.scaleX =0.3;
+  image2.scaleY = 0.3;
+
+  //내 빵
+  my_bread = new createjs.Text("죽빵", "40px Arial", "#FFF0A0");
+  my_bread.x = 440;
+  my_bread.y = 20;
+  stage.addChild(my_bread);
+
+  //빵
+  bread = new createjs.Text("My Bread", "20px Arial", "#6F2500");
+  bread.x = 440;
+  bread.y = 60;
+  stage.addChild(bread);
+
+
+  //빵
+  user_name = new createjs.Text("한성_이문성", "20px Arial", "white");
+  user_name.x = 425;
+  user_name.y = 230;
+  stage.addChild(user_name);
+
+
+  //페이지 하단 싱글 & 멀티 플레이 버튼
   rect = new createjs.Shape();
-  rect.graphics.beginFill("#ff9600").drawRoundRect(260,270,200,150,30,30,30,30);
+  rect.graphics.beginFill("#ff9600").drawRoundRect(260,280,200,150,30,30,30,30);
   rect.shadow = new createjs.Shadow('#000', 4, 4, 5);
   stage.addChild(rect);
 
   rect.addEventListener("click", function(event) {
-      $state.go("play");
+      $state.go("single");
      })
 
   rect2 = new createjs.Shape();
-  rect2.graphics.beginFill("#ff9600").drawRoundRect(500,270,200,150,30,30,30,30);
+  rect2.graphics.beginFill("#ff9600").drawRoundRect(500,280,200,150,30,30,30,30);
   rect2.shadow = new createjs.Shadow('#000', 4, 4, 5);
   stage.addChild(rect2);
 
   pie1 = new createjs.Shape().set({x:280, y:150});
+  level_value =1;
   pie1.rotation = -90;
-  pie1.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-level_value ,true);
+  pie1.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-(Math.PI /180  * 12 * level_value) ,true);
   stage.addChild(pie1);
 
+  createjs.Ticker.addEventListener("tick", levelTick);
+  createjs.Ticker.setFPS(100);
+  function levelTick() {
+    if(!createjs.Ticker.getPaused()){
+      if(level_value <=11){
+        level_value += 0.2;
+      }
+      if(exp_value <= 70){
+        exp_value +=1;
+      }
+      if(level_value == 11 &&exp_value ==70 )
+      {
+        var paused = !createjs.Ticker.getPaused();
+        createjs.Ticker.setPaused(paused);
+      }
+      pie1.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0, 0, 70, 0, -(Math.PI / 180 * 12 * level_value), true);
+      pie2.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0, 0, 70, 0, -(Math.PI / 180 * 3.6 * exp_value), true);
+      stage.update();
+    }
+  }
+
   pie2 = new createjs.Shape().set({x:680, y:150});
+  exp_value =1;
   pie2.rotation = -90;
-  pie2.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-exp_value ,true);
+  pie2.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-(Math.PI / 180 * 3.6 * exp_value) ,true);
 
   stage.addChild(pie2);
+
+
 
   //레벨
   text1 = new createjs.Text("Level. 11", "20px Arial", "#ff0000");
@@ -71,9 +143,73 @@ angular.module('starter.controllers', [])
   single2.y = 350;
   stage.addChild(single2);
 
-
   stage.update();
 })
+
+//싱글 플레이 모드 화면
+
+  .controller('SingleCtrl', function($scope,$state) {
+
+
+    stage = new createjs.Stage("singleCanvas");
+    createjs.Touch.enable(stage);
+
+    var image = new createjs.Bitmap("img/bread.png");
+    stage.addChild(image);
+
+    image.x=830;
+    image.y=0;
+    image.scaleX =0.2;
+    image.scaleY = 0.2;
+
+    var ant_image = new createjs.Bitmap("img/FireAnt.png");
+    stage.addChild(ant_image);
+
+    ant_image.x=650;
+    ant_image.y=70;
+    ant_image.scaleX =0.35;
+    ant_image.scaleY = 0.35;
+    //개미 텍스트
+    my_ant = new createjs.Text("불개미", "30px Arial", "#ff9600");
+    my_ant.x = 640;
+    my_ant.y = 150;
+    stage.addChild(my_ant);
+
+
+    rect = new createjs.Shape();
+    rect.graphics.beginFill("#ff9600").drawRoundRect(380,50,200,150,30,30,30,30);
+    rect.shadow = new createjs.Shadow('#000', 4, 4, 5);
+    stage.addChild(rect);
+
+    rect.addEventListener("click", function(event) {
+      $state.go("play");
+    })
+    //싱글
+    single = new createjs.Text("싱글 플레이", "25px Arial", "#ff0000");
+    single.x = 415;
+    single.y = 90;
+    stage.addChild(single);
+
+    single2 = new createjs.Text("Single Play", "15px Arial", "#ff0000");
+    single2.x = 445;
+    single2.y = 120;
+    stage.addChild(single2);
+
+  //스테이지 그래프
+    pie1 = new createjs.Shape().set({x:280, y:135});
+    level_value =1;
+    pie1.rotation = -90;
+    pie1.graphics.setStrokeStyle(20).beginStroke("#ff0000").arc(0,0,70,0,-360 ,true);
+    stage.addChild(pie1);
+
+    //스테이지 텍스트트
+   text1 = new createjs.Text("Stage. 3 ", "20px Arial", "#ff9600");
+    text1.x = 240;
+    text1.y = 125;
+    stage.addChild(text1);
+
+    stage.update();
+  })
 
 .controller('PlayCtrl', function($scope) {
 
