@@ -1,6 +1,21 @@
 angular.module('starter.controllers', [])
 
+.controller('IndexCtrl',function ($scope) {
+  var soundID = "BGM";
+
+    createjs.Sound.registerSound("bgm/bgm.mp3" ,soundID);
+    createjs.Sound.addEventListener("fileload", handleFileLoad);
+  function handleFileLoad(event) {
+    // A sound has been preloaded.
+    console.log("Preloaded:", event.id, event.src);
+    createjs.Sound.play(soundID);
+  }
+
+})
+
+
 .controller('ModeCtrl', function($scope,$state) {
+
 
   stage = new createjs.Stage("modeCanvas");
   createjs.Touch.enable(stage);
@@ -12,6 +27,7 @@ angular.module('starter.controllers', [])
   image.y=0;
   image.scaleX =0.2;
   image.scaleY = 0.2;
+
 
   var image1 = new createjs.Bitmap("img/ant.png");
   stage.addChild(image1);
@@ -42,6 +58,7 @@ angular.module('starter.controllers', [])
   bread.x = 440;
   bread.y = 60;
   stage.addChild(bread);
+
 
   //빵
   user_name = new createjs.Text("한성_이문성", "20px Arial", "white");
@@ -125,6 +142,8 @@ angular.module('starter.controllers', [])
   single2.y = 350;
   stage.addChild(single2);
 
+
+
   //멀티
   single = new createjs.Text("멀티 플레이", "25px Arial", "#ff0000");
   single.x = 535;
@@ -200,6 +219,32 @@ angular.module('starter.controllers', [])
     text1.x = 240;
     text1.y = 125;
     stage.addChild(text1);
+
+
+    //스테이지 드래그
+    stage.mouseMoveOutside = true;
+    var imagestage = new Array();
+    var dragger = new createjs.Container();
+    dragger.x =0;
+    dragger.y =300;
+    for(i=0;i<10;i++) {
+      imagestage[i] = new createjs.Bitmap("img/stage.png");
+      imagestage[i].scaleX = 0.5;
+      imagestage[i].scaleY = 0.5;
+      imagestage[i].x = 200 *i;
+      dragger.addChild(imagestage[i]);
+    }
+
+    stage.addChild(dragger);
+    dragger.on("mousedown", function (evt) {
+      this.parent.addChild(this);
+      this.offset = {x: this.x - evt.stageX, y: this.y - evt.stageY};
+    });
+
+    dragger.on("pressmove", function (evt) {
+      this.x = evt.stageX + this.offset.x;
+    });
+
 
     stage.update();
   })
@@ -286,7 +331,11 @@ angular.module('starter.controllers', [])
 
   function init() {
 
+    var id;
+
     var ant = function (team, type) {
+      id++;
+      var antId = id;
       var type = type;
       var team = team;
       var state;
@@ -295,7 +344,10 @@ angular.module('starter.controllers', [])
       var atkSpeed;
       var damage;
       var skill;
+      var x;
+      var y;
       var enemy = null;
+      return this
     };
 
     ///////////////////기본 설정////////////////
@@ -377,16 +429,18 @@ angular.module('starter.controllers', [])
     }
 
 
-    function makeEnemy(type) {
-      var enemy = new createjs.Bitmap("img/workant.png");
-      // image.prototype = new ant(1,type);
-      enemy.x = startPositionX+600;
-      enemy.y = startPositionY;
-      enemy.hp = 100;
-      enemy.damage = 10;
-      enemyAntList.push(enemy);
-      stage.addChild(enemy);
-    }
+    var makeAnt = function (direction, type) {
+      var ant = makeUnit(type);
+      setInterval(function () {
+//                    checkState(ant);
+//                    if (ant.state == "attack") {
+//                        attack(ant);
+//                    } else if (ant.state == "move") {
+        move(ant, direction)
+//                    }
+//
+      }, (100))
+    };
 
     stage.update(event);
     createjs.Ticker.addEventListener("tick", stateCheck);
@@ -403,6 +457,9 @@ angular.module('starter.controllers', [])
         }
         ant.state = "move";
 
+    var attack = function (ant) {
+      ant.enemy.health -= ant.damage;
+    };
 
        enemyAntList.forEach(function (enemy, e_index){
           if (enemy.hp <= 0) {
@@ -453,6 +510,8 @@ angular.module('starter.controllers', [])
       // stage.update(event);
     })
 
+    makeAnt("up", 'workAnt');
+    makeAnt("straight", 'workAnt');
   }
 
   function doBehavior(event) {
@@ -475,6 +534,7 @@ angular.module('starter.controllers', [])
     });
     stage.update(event);
   }
+
   init();
 });
 
