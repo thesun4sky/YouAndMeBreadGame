@@ -214,6 +214,8 @@ angular.module('starter.controllers', [])
   // 빵의 기본 좌표 설정
   var startPositionX = 140;
   var startPositionY = 230;
+  var enemyStartPositionX = 800;
+  var enemyStartPositionY = 230;
 
   var stage;
   var myAntList = [];
@@ -244,6 +246,28 @@ angular.module('starter.controllers', [])
       unit.y = startPositionY;
     }
   };
+
+
+  var enemyMove = function (unit, direction) {
+    if (unit.x > startPositionX) {
+      // console.log("move function is called" + unit.x + ", " + unit.y);
+      if (direction == "down") {
+        unit.x = unit.x - 2;
+        unit.y = (Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + enemyStartPositionY);
+      } else if (direction == "up") {
+        unit.x = unit.x - 1;
+        unit.y = (-Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + enemyStartPositionY);
+      } else if (direction == "straight") {
+        unit.x = unit.x - 2;
+        unit.y = enemyStartPositionY;
+      }
+    }
+    else {
+      unit.x = enemyStartPositionX;
+      unit.y = enemyStartPositionY;
+    }
+  };
+
 
   function init() {
 
@@ -285,9 +309,6 @@ angular.module('starter.controllers', [])
     //////////////////////////기본 설정 끝
 
     //적 생성
-    enemyId = 0;
-
-    enemyId++;
     enemy0 = new createjs.Shape();
     enemy0.graphics.beginFill("blue").drawCircle(0, 0, 30);
     enemy0.x = 450;
@@ -343,7 +364,7 @@ angular.module('starter.controllers', [])
         ant.state = "move";
 
 
-        for (var j = 0; j < enemyAntList.length; j++) {
+        /*for (var j = 0; j < enemyAntList.length; j++) {
           if (enemyAntList[j].hp <= 0) {
             enemyAntList.splice(j,1);
             stage.removeChild(enemy1);
@@ -357,8 +378,24 @@ angular.module('starter.controllers', [])
             ant.state = "move";
             ant.enemy = null;
           }
-        }
-        // stage.update(event);
+        }*/
+
+        enemyAntList.forEach(function (enemy,index) {
+          if (enemy.hp <= 0) {
+            enemyAntList.splice(index,1);
+            stage.removeChild(enemy);
+            alert("적 체력 0");
+          }
+          var pt = enemy.localToLocal(-50, 0, ant);
+          if (ant.hitTest(pt.x, pt.y)) {
+            ant.state = "attack";
+            ant.enemy = index;
+          } else {
+            ant.state = "move";
+            ant.enemy = null;
+          }
+        });
+
       })
     }
 
