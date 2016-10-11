@@ -268,16 +268,16 @@ angular.module('starter.controllers', [])
     myAntList[ant.enemy].hp -= ant.damage;
   };
 
-  var move = function (unit, direction) {
+  var move = function (unit) {
     if (unit.x < 800) {
       // console.log("move function is called" + unit.x + ", " + unit.y);
-      if (direction == "down") {
+      if (unit.direction == "down") {
         unit.x = unit.x + 2;
         unit.y = (Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
-      } else if (direction == "up") {
+      } else if (unit.direction == "up") {
         unit.x = unit.x + 1;
         unit.y = (-Math.sqrt((18000-(1/5)*((unit.x-450)*(unit.x-450)))) + startPositionY);
-      } else if (direction == "straight") {
+      } else if (unit.direction == "straight") {
         unit.x = unit.x + 2;
         unit.y = startPositionY;
       }
@@ -355,13 +355,54 @@ angular.module('starter.controllers', [])
 
     //canvas와 js 연동
     stage = new createjs.Stage("demoCanvas");
-    var image = new createjs.Bitmap("img/YMBplay.png");
-    stage.addChild(image);
+    //터치 가능
     createjs.Touch.enable(stage);
+    //배경화면
+    var background = new createjs.Bitmap("img/YMBplay.png");
+    background.name = "nowhere";
+    stage.addChild(background);
+
+    //공격방향 변수
+    var direction = "nowhere";
+
+    //위 직진 아래 이미지
+    var up = new createjs.Bitmap("img/up.png");
+    up.x = 140;
+    up.y = 155;
+    up.name = "up";
+    stage.addChild(up);
+
+    var straight = new createjs.Bitmap("img/straight.png");
+    straight.x = 140;
+    straight.y = 285;
+    straight.name = "straight";
+    stage.addChild(straight);
+
+    var down = new createjs.Bitmap("img/down.png");
+    down.x = 140;
+    down.y = 285;
+    down.name = "down";
+    stage.addChild(down);
+
+
+    background.on("click", handleMouseEvent);
+    up.on("click", handleMouseEvent);
+    straight.on("click", handleMouseEvent);
+    down.on("click", handleMouseEvent);
+
+    function handleMouseEvent(evt) {
+      direction = evt.target.name;
+      text.text = "direction: "+direction;
+
+      // to save CPU, we're only updating when we need to, instead of on a tick:1
+      stage.update();
+    }
+
     // 빵의 생산량
-    var text = new createjs.Text("2000", "60px Arial", "#ffffff");
+    var text = new createjs.Text("2000", "10px Arial", "#ffffff");
     text.x = 380; text.y = 10;
     stage.addChild(text);
+
 
     //빵 모양 및 위치 초기화
     var bread = new createjs.Shape();
@@ -407,23 +448,28 @@ angular.module('starter.controllers', [])
 
     //빵 클릭시 이벤트
     bread.addEventListener("click", function(event) {
-      makeUnit('workAnt');
+      if (direction !="nowhere") {
+        makeUnit('workAnt');
+      }
     });
 
     //상대 클릭시 이벤트
     enemy_bread.addEventListener("click", function(event) {
-      makeEnemy('workAnt');
+      if (direction !="nowhere") {
+        makeEnemy('workAnt');
+      }
     });
 
     //유닛 생성
     //방향 및 속성값을 받아 유닛 생성
     function makeUnit(type) {
       var image = new createjs.Bitmap("img/workant.png");
-      // image.prototype = new ant(1,type);
+      image.direction = direction;
       image.x = startPositionX;
       image.y = startPositionY;
       image.hp = 100;
       image.damage = 10;
+      direction = "nowhere";
       stage.addChild(image);
       myAntList.push(image);
     }
@@ -497,7 +543,7 @@ angular.module('starter.controllers', [])
           stage.removeChild(enemy);
           alert("내 체력 0");
         }
-        var pt = enemy.localToLocal(0, 0, ant);
+        var pt = enemy.localToLocal(100, 0, ant);
         if (ant.hitTest(pt.x, pt.y)) {
           ant.state = "attack";
           ant.enemy = e_index;
@@ -519,7 +565,7 @@ angular.module('starter.controllers', [])
       if (ant.state =="attack") {
         attack(ant);
       } else if (ant.state == "move") {
-        move(ant,"down");
+        move(ant);
       }
     });
     stage.update(event);
