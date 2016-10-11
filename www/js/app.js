@@ -39,7 +39,8 @@ angular.module('starter', [
 
     .state('index',{
       url: '/index',
-      templateURL: 'index.html'
+      templateURL: 'index.html',
+      controller:'IndexCtrl'
     })
     .state('mode', {
     url: '/mode',
@@ -62,3 +63,4 @@ angular.module('starter', [
   $urlRouterProvider.otherwise('/index');
 
 });
+
