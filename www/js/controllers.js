@@ -287,7 +287,7 @@ angular.module('starter.controllers', [])
       unit.health.y = unit.y-50;
     }
     else {
-      unit.state = "death";
+
     }
   };
 
@@ -309,7 +309,7 @@ angular.module('starter.controllers', [])
       unit.health.y = unit.y-50;
     }
     else {
-      unit.state = "death";
+
     }
   };
 
@@ -378,9 +378,9 @@ angular.module('starter.controllers', [])
     }
 
     function handleMouseEvent(evt) {
-      direction = evt.target.name + evt.type;
+      direction = evt.target.name;
       evt.target.alpha = 1.0;
-      text.text = "direction: "+direction;
+      text.text = "direction: "+direction + evt.type;
 
       // to save CPU, we're only updating when we need to, instead of on a tick:1
       stage.update();
@@ -476,6 +476,10 @@ angular.module('starter.controllers', [])
 
   function stateCheck(event) {
       myAntList.forEach(function (ant,index) {
+        //체력이 0일 경우
+        if (ant.hp <= 0) {
+          myAntList.splice(index,1);
+        }
         ant.state = "move";
         if (ant.hp <= 0) {
             ant.state = "death";
